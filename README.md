@@ -11,6 +11,8 @@ The motivation is that Oura provides a large number of interesting sleep metrics
 ### Detailed Design
 For version 1, I want to schedule the function to run once a day and read sleep data from Oura and load it into a specific Google Sheet.
 
+For [Oura API Reference](https://cloud.ouraring.com/v2/docs).
+
 This function will call `/v2/usercollection/sleep` to fetch the past 7 days of sleep documents. The single document route requires knowning the `document_id`, which you can't know without a previous fetch.
 
 From this document it will gather:
