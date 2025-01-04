@@ -8,7 +8,7 @@ from firebase_admin import initialize_app
 from oura_ring import OuraClient
 from datetime import date, timedelta
 from googleapiclient.discovery import build
-from google.oauth2.credentials import Credentials
+from oauth2client.service_account import ServiceAccountCredentials
 
 initialize_app()
 
@@ -33,11 +33,13 @@ def fetch_oura_data(req: https_fn.Request) -> https_fn.Response:
 
 TEST_SPREADSHEET_ID = '1KfyNKP6GU0WeAsRwPXewHqRc6iE5SRdhQnjtfzE0rrE'
 TEST_RANGE = 'A2:C5'
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 
 @https_fn.on_request()
 def write_to_sheets(req: https_fn.Request) -> https_fn.Response:
-    creds = Credentials.from_authorized_user_file("oura-ring-data-relay-4b853eae714b.json")
+    creds = ServiceAccountCredentials.from_json_keyfile_name("oura-ring-data-relay-4b853eae714b.json", SCOPES)
+    # creds = Credentials.from_authorized_user_info("oura-ring-data-relay-4b853eae714b.json", SCOPES)
     client = build("sheets", "v4", credentials=creds)
     sheets = client.spreadsheets()
 
