@@ -163,3 +163,4 @@ cython_debug/
 
 # Firebase configs and secrets
 functions/.env.oura-ring-data-relay
+oura-ring-data-relay-4b853eae714b.json

@@ -7,6 +7,8 @@ from firebase_functions.params import StringParam
 from firebase_admin import initialize_app
 from oura_ring import OuraClient
 from datetime import date, timedelta
+from googleapiclient.discovery import build
+from google.oauth2.credentials import Credentials
 
 initialize_app()
 
@@ -28,6 +30,25 @@ def fetch_oura_data(req: https_fn.Request) -> https_fn.Response:
     sleep_data = [extract_sleep_fields(data) for data in raw_sleep_data]
 
     return https_fn.Response(f'{sleep_data}')
+
+TEST_SPREADSHEET_ID = '1KfyNKP6GU0WeAsRwPXewHqRc6iE5SRdhQnjtfzE0rrE'
+TEST_RANGE = 'A2:C5'
+
+
+@https_fn.on_request()
+def write_to_sheets(req: https_fn.Request) -> https_fn.Response:
+    creds = Credentials.from_authorized_user_file("oura-ring-data-relay-4b853eae714b.json")
+    client = build("sheets", "v4", credentials=creds)
+    sheets = client.spreadsheets()
+
+    result = (
+        sheets.values()
+        .get(spreadsheetId=TEST_SPREADSHEET_ID, range=TEST_RANGE)
+        .execute()
+    )
+
+    values = result.get("values", [])
+    return https_fn.Response(f'{values}')
 
 
 def extract_sleep_fields(sleep_data: dict[str, any]) -> dict[str, any]:
