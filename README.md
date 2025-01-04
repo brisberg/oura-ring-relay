@@ -18,6 +18,7 @@ This function will call `/v2/usercollection/sleep` to fetch the past 7 days of s
 From this document it will gather:
 - `id`
 - `day`
+- `type`
 - `bedtime_start`
 - `bedtime_end`
 - `time_in_bed`
@@ -31,3 +32,12 @@ From this document it will gather:
 The function will then connect to Google Sheets and add it to a new row in a pre-defined Sheet.
 
 Then I can set up graphs/visualizations in Google Sheets itself.
+
+### TODOs
+
+Clean up the permissions on the Google Sheets side
+- Maybe use a IAM role instead of sharing directly with the service account
+Find a better way to pass in the SheetID, and Service account information than packaging a file.
+
+Add some updated tests for this
+Add some error catching if the data is malformed somehow.
