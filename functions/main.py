@@ -70,6 +70,7 @@ def extract_sleep_fields(sleep_data: dict[str, any]) -> list:
     return [
         sleep_data['id'],
         sleep_data['day'],
+        sleep_data['type'],
         sleep_data['bedtime_start'],
         sleep_data['bedtime_end'],
         sleep_data['time_in_bed'],

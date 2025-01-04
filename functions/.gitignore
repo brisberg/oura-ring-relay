@@ -1,1 +1,5 @@
 *.local
+
+# Credentials
+.env.oura-ring-data-relay
+oura-ring-data-relay-4b853eae714b.json
