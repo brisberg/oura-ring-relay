@@ -2,7 +2,7 @@
 # To get started, simply uncomment the below code or create your own.
 # Deploy with `firebase deploy`
 
-from firebase_functions import https_fn
+from firebase_functions import https_fn, scheduler_fn
 from firebase_functions.params import StringParam
 from firebase_admin import initialize_app
 from oura_ring import OuraClient
@@ -18,14 +18,10 @@ TEST_SPREADSHEET_ID = '1KfyNKP6GU0WeAsRwPXewHqRc6iE5SRdhQnjtfzE0rrE'
 TEST_RANGE = 'SleepData!A:K'
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
-
-
-@https_fn.on_request()
-def on_request_example(req: https_fn.Request) -> https_fn.Response:
-    return https_fn.Response(f'OURA_VARIABLE={OURA_PAT.value}')
-
-@https_fn.on_request()
-def fetch_oura_data(req: https_fn.Request) -> https_fn.Response:
+# Run every day at 1 PM (hopefully I've synced with Oura by then)
+@scheduler_fn.on_schedule(schedule="every day 13:00")
+def fetch_oura_data(event: scheduler_fn.ScheduledEvent) -> None:
+    # Read Sleep Data from Oura
     oura_client = OuraClient(OURA_PAT.value)
 
     enddate = date.today()
@@ -34,6 +30,7 @@ def fetch_oura_data(req: https_fn.Request) -> https_fn.Response:
     raw_sleep_data = oura_client.get_sleep_periods(start_date=str(startdate), end_date=str(enddate))
     sleep_data = [extract_sleep_fields(data) for data in raw_sleep_data]
 
+    # Write sleep data to Google Sheets
     creds = ServiceAccountCredentials.from_json_keyfile_name("oura-ring-data-relay-4b853eae714b.json", SCOPES)
     client = build("sheets", "v4", credentials=creds)
     sheets = client.spreadsheets()
@@ -46,8 +43,6 @@ def fetch_oura_data(req: https_fn.Request) -> https_fn.Response:
 
     body = {'values': new_sleep_data}
     sheets.values().append(spreadsheetId=TEST_SPREADSHEET_ID, range=TEST_RANGE, valueInputOption="RAW", body=body).execute()
-
-    return https_fn.Response(f'{sleep_data}')
 
 
 @https_fn.on_request()
