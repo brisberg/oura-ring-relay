@@ -18,9 +18,9 @@ TEST_SPREADSHEET_ID = '1KfyNKP6GU0WeAsRwPXewHqRc6iE5SRdhQnjtfzE0rrE'
 TEST_RANGE = 'SleepData!A:K'
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
-# Run every day at 9 PM USC (1 PM PST)
+# Run every day at 7 PM UTC (11 AM PST)
 # (hopefully I've synced with Oura by then)
-@scheduler_fn.on_schedule(schedule="21 0 * * *")
+@scheduler_fn.on_schedule(schedule="19 0 * * *")
 def fetch_oura_data(event: scheduler_fn.ScheduledEvent) -> None:
     # Read Sleep Data from Oura
     oura_client = OuraClient(OURA_PAT.value)
